@@ -35,7 +35,8 @@ public class GameScreen extends Activity {
     private void setupGame(){
         Log.d(TAG, "setting up game");
         spaceship = new Spaceship(200, 400);
-        setupOnTick();
+        Ticker.ticker.addMethod(tick);
+
     }
 
     public Spaceship getSpaceship() {
@@ -43,26 +44,17 @@ public class GameScreen extends Activity {
     }
 
 
-    private void setupOnTick(){
-        final Handler handler = new Handler();
-        Timer timer = new Timer(false);
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        OnTick();
-                    }
-                });
-            }
-        };
+   public void onTick(){
+       this.spaceship.regenShield();
+       this.gameView.invalidate();
+   }
 
-        timer.scheduleAtFixedRate(timerTask, 10, 10); // every 10 mS
-    }
+    final Runnable tick = new Runnable() {
+        @Override
+        public void run() {
+            onTick();
+        }
+    };
 
-    private void OnTick(){
-        this.spaceship.regenShield();
-        this.gameView.invalidate();
-    }
+
 }

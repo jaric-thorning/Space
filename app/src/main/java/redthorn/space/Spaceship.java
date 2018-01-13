@@ -1,16 +1,18 @@
 package redthorn.space;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Canvas;
-import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 import android.graphics.Paint;
 import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import redthorn.space.Systems.Shield;
+import redthorn.space.Weapons.MissileLauncher;
+import redthorn.space.Weapons.Weapon;
 
 /**
  * Created by jaricthorning on 3/1/18.
@@ -29,8 +31,11 @@ public class Spaceship extends Entity {
     private float centerOffsetY;
     private float minShieldRadius;
 
+    private List<Weapon> availableWeapons = new ArrayList<>();
+
 
     public Spaceship(int x, int y){
+
         super(x, y);
         this.x = x;
         this.y = y;
@@ -45,7 +50,12 @@ public class Spaceship extends Entity {
         this.centerOffsetY = 150 + 12;
         this.minShieldRadius = 300;
 
+
+        availableWeapons.add(new MissileLauncher());
         updateLayoutRects();
+
+        /* Activate ticker */
+        Ticker.ticker.addMethod(this.tick);
     }
 
     void addRoom(Room room){
@@ -130,6 +140,30 @@ public class Spaceship extends Entity {
     public Shield getShield(){
         return shield;
     }
+
+    public Weapon getWeapon1(){
+        if(availableWeapons.size() >= 1){
+            return availableWeapons.get(0);
+        }
+        return null;
+    }
+
+
+    public void onTick(){
+
+        for(Weapon weapon : availableWeapons){
+            if(weapon.isReadyToFire()){
+                weapon.fire();
+            }
+        }
+    }
+
+    final Runnable tick = new Runnable() {
+        @Override
+        public void run() {
+            onTick();
+        }
+    };
 
 
 
